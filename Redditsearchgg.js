@@ -1,23 +1,23 @@
 // ==UserScript==
 // @name         Google Search - Reddit Filter Button
 // @namespace    https://github.com/Dkdj77/Reddit-search-on-google/
-// @version      1.0
+// @version      1.01
 // @description  Adds a fancy button adding site:reddit.com to the end of your search!
 // @author       DK
-// @match        https://www.google.com/search?*
+// @include *://www.google.*/*
 // @grant        none
 // ==/UserScript==
-
+ 
 (function() {
     'use strict';
-
+ 
     function createRedditButton() {
         if(document.getElementById('reddit-filter-btn')) return;
-
+ 
         // Find a container below search box (search form area)
         const searchForm = document.querySelector('form[role="search"]');
         if (!searchForm) return;
-
+ 
         const btn = document.createElement('button');
         btn.id = 'reddit-filter-btn';
         btn.textContent = 'Search Reddit';
@@ -34,20 +34,20 @@
             font-family: Arial, sans-serif;
             user-select: none;
         `;
-
+ 
         btn.addEventListener('click', e => {
             e.preventDefault();
-
+ 
             const urlParams = new URLSearchParams(window.location.search);
             let q = urlParams.get('q') || '';
-
+ 
             if (!q.includes('site:reddit.com')) {
                 q = q.trim() + ' site:reddit.com';
                 urlParams.set('q', q);
                 window.location.href = '/search?' + urlParams.toString();
             }
         });
-
+ 
         // Append button next to search input (or to search form)
         const searchInput = searchForm.querySelector('input[name="q"]');
         if (searchInput && searchInput.parentElement) {
@@ -56,7 +56,7 @@
             searchForm.appendChild(btn);
         }
     }
-
+ 
     
     function waitForSearchForm(retries = 20) {
         const searchForm = document.querySelector('form[role="search"]');
@@ -66,13 +66,13 @@
             setTimeout(() => waitForSearchForm(retries - 1), 500);
         }
     }
-
+ 
     waitForSearchForm();
-
+ 
     // Also observe page for NEW changes bruh
     const observer = new MutationObserver(() => {
         createRedditButton();
     });
-
+ 
     observer.observe(document.body, {childList: true, subtree: true});
 })();
